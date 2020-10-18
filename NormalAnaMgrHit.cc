@@ -101,7 +101,7 @@ NormalAnaMgrHit::BeginOfRunAction(const G4Run* /*aRun*/) {
     }
     m_timer_beginrun->start();
 
-    m_evt_tree = svc->bookTree("SIMEVT/evt", "evt");
+    m_evt_tree = svc->bookTree("SIMEVT/evt_hit", "evt_hit");
     m_evt_tree->Branch("evtID", &m_eventID, "evtID/I");
     m_evt_tree->Branch("nPhotons", &m_nPhotons, "nPhotons/I");
    // m_evt_tree->Branch("totalPE", &m_totalPE, "totalPE/I");
@@ -150,8 +150,8 @@ NormalAnaMgrHit::BeginOfRunAction(const G4Run* /*aRun*/) {
     m_evt_tree->Branch("BoundaryPosY", m_boundarypos_y, "BoundaryPosY[nPhotons]/F");
     m_evt_tree->Branch("BoundaryPosZ", m_boundarypos_z, "BoundaryPosZ[nPhotons]/F");
   
-    m_step_no = new TH1I("stepno", "step number of optical photons", 1000, 0, 1000);
-    svc->attach("SIMEVT", m_step_no);
+ //   m_step_no = new TH1I("stepno", "step number of optical photons", 1000, 0, 1000);
+  //  svc->attach("SIMEVT", m_step_no);
   
     m_timer_beginrun->stop();  
     key = "t_beginrun";
@@ -171,8 +171,8 @@ NormalAnaMgrHit::BeginOfEventAction(const G4Event* evt) {
     m_eventID = evt->GetEventID();
     m_nPhotons = 0;
  //   m_totalPE = 0;
-    for(int i = 0; i < 2000000; i++) {
-      m_nPE[i] = 0;
+   for(int i = 0; i < 2000000; i++) {
+    /*  m_nPE[i] = 0;
       m_energy[i] = 0;
       m_hitTime[i] = 0;
       m_pmtID[i] = 0;
@@ -192,7 +192,7 @@ NormalAnaMgrHit::BeginOfEventAction(const G4Event* evt) {
 
       m_boundarypos_x[i] = 0.;
       m_boundarypos_y[i] = 0.;
-      m_boundarypos_z[i] = 0.;
+      m_boundarypos_z[i] = 0.;*/
     }
     
    /* m_edep = 0.;
@@ -247,11 +247,13 @@ NormalAnaMgrHit::EndOfEventAction(const G4Event* evt) {
                 LogDebug << "+++++ from cerenkov" << std::endl;
                 m_isCerenkov[i] = 1;
             }
+            else{m_isCerenkov[i] = 0;}
             if ((*col)[i]->IsReemission()) {
                 LogDebug << "+++++ reemission" << std::endl;
                 m_isReemission[i] = 1;
             }
-
+            else{m_isReemission[i] = 0;}
+           
             m_isOriginalOP[i] = (*col)[i]->IsOriginalOP();
             m_OriginalOPTime[i] = (*col)[i]->GetOriginalOPStartT();
             m_peTrackID[i] = (*col)[i]->GetProducerID();
@@ -321,7 +323,7 @@ void
 NormalAnaMgrHit::UserSteppingAction(const G4Step* step) {
     m_timer_step->start();  
  
-   G4Track* track = step->GetTrack();
+ /*  G4Track* track = step->GetTrack();
     // if the step number of optical photon bigger than X, mark it as killed
     if (track->GetDefinition() == G4OpticalPhoton::Definition()) {
         G4int stepno = track->GetCurrentStepNumber();
@@ -349,7 +351,7 @@ NormalAnaMgrHit::UserSteppingAction(const G4Step* step) {
         
         
     }
-   
+   */  
     m_timer_step->stop();
     key = "t_step";
     m_datacollsvc->collectData(key, m_timer_step->elapsed());
